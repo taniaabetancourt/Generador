@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script>
+      var ventas;
+      var ventas2;
+      function generador() {
+        var numero = document.getElementById("genNumber").value;
+
+        ventas =
+          "USE punto_venta; <br>" +
+          "DELETE FROM venta_detalle;<br>" +
+          "DELETE FROM venta; <br>" +
+          "INSERT INTO venta(id, fecha, hora)VALUES <br>(1," +
+          "'" +
+          ranDate() +
+          "'" +
+          "," +
+          "'" +
+          ranTime() +
+          "')" +
+          ",";
+
+        for (let index = 2; index <= numero; index++) {
+          ventas +=
+            "<br>(" +
+            index +
+            ",'" +
+            ranDate() +
+            "' , '" +
+            ranTime() +
+            "'),";
+        }
+
+        if (ventas.endsWith(",")) {
+          ventas = ventas.slice(0, -1) + ";";
+        }
+
+        ventas += `
+        
+        <br> INSERT INTO venta_detalle(idSellsnta, IDProducto) VALUES <br>
+        `;
+
+        for (let i = 1; i <= numero; i++) {
+          var idSells = Math.floor(Math.random() * 10) + 1;
+          for (let j = 0; j < idSells; j++) {
+            ventas +=
+              "(" + i + "," + (Math.floor(Math.random() * 10) + 1) + "),";
+          }
+        }
+
+        if (ventas.endsWith(",")) {
+          ventas = ventas.slice(0, -1) + ";";
+        }
+
+        document.getElementById("innerVentas").innerHTML = ventas;
+      }
+
+      function generadorJSON(){
+        var numero = document.getElementById("genNumber").value;
+
+        var data = {
+            ventas: [],
+            ventas_detalle: []
+        };
+
+        for (let i = 1; i <= numero; i++) {
+         
+            data.ventas.push({
+                id: i,
+                fecha: ranDate(),
+                hora: ranTime()
+            });
+
+          
+            var idSells = Math.floor(Math.random() * 10) + 1;
+            for (let j = 0; j < idSells; j++) {
+                data.ventas_detalle.push({
+                    idSellsnta: i,
+                    IDProducto: (Math.floor(Math.random() * 10) + 1)
+                });
+            }
+            var jsonOutput = JSON.stringify(data, null, 2); 
+
+            document.getElementById("innerVentas").innerHTML = jsonOutput;
+        }
+      }
+
+      function generadorCsv() {
+        var numero = document.getElementById("genNumber").value;
+
+        ventas =
+          "<br>1," +
+          "" +
+          ranDate() +
+          "" +
+          "," +
+          "" +
+          ranTime() +
+          "" +
+          "";
+
+        for (let index = 2; index <= numero; index++) {
+          ventas +=
+            "<br>" +
+            index +
+            "," +
+            ranDate() +
+            "," +
+            ranTime() +
+            "";
+        }
+
+      
+
+        document.getElementById("innerVentas").innerHTML = ventas; 
+
+        ventas2 = "";
+
+        for (let i = 1; i <= numero; i++) {
+          var idSells = Math.floor(Math.random() * 10) + 1;
+          for (let j = 0; j < idSells; j++) {
+            ventas2 +=
+              "" + i + "," + (Math.floor(Math.random() * 10) + 1) + "<br>";
+          }
+        }
+
+       
+
+        document.getElementById("innerVentas2").innerHTML = ventas2;
+      }
+
+      function ranDate() {
+        var año = Math.floor(Math.random() * (2022 - 2000 + 1)) + 2000;
+        var mes = Math.floor(Math.random() * 12) + 1;
+        var dia = Math.floor(Math.random() * 31) + 1;
+        var hora = Math.floor(Math.random() * 24);
+        var minuto = Math.floor(Math.random() * 60);
+        var segundo = Math.floor(Math.random() * 60);
+
+        var fechaAleatoria = new Date(año, mes - 1, dia, hora, minuto, segundo);
+
+        var newFecha = fechaAleatoria.toISOString().split("T")[0];
+
+        return newFecha;
+      }
+
+      function ranTime() {
+
+        var horas = Math.floor(Math.random() * 24); // 0 a 23
+        var minutos = Math.floor(Math.random() * 60); // 0 a 59
+        var segundos = Math.floor(Math.random() * 60); // 0 a 59
+
+        var newHora =
+          padLeft(horas) + ":" + padLeft(minutos) + ":" + padLeft(segundos);
+
+        return newHora;
+      }
+
+      function padLeft(numero) {
+        return numero < 10 ? "0" + numero : numero;
+      }
+
+      //guardar archivo SQL
+      function generarArchivoSQL() {
+        var archivo = document.createElement("a");
+        var salida = ventas.replace(/<br>/g, "\n").trim();
+        archivo.setAttribute(
+          "href",
+          "data:text/plane;charset=UTF-8," + encodeURIComponent(salida)
+        );
+        archivo.setAttribute("download", "punto_venta.sql");
+        archivo.style.display = "none";
+
+        document.body.appendChild(archivo);
+
+        archivo.click();
+
+        document.body.removeChild(archivo);
+      }
+
+      function CSVgenerator() {
+        var archivo = document.createElement("a");
+
+        var parrafo = document.querySelector("p");
+
+        var texto1 = parrafo.querySelector("#innerVentas");
+
+        var salida = ventas.replace(/<br>/g, "\n").trim();
+        archivo.setAttribute(
+          "href",
+          "data:text/plane;charset=UTF-8," + encodeURIComponent(salida)
+        );
+        archivo.setAttribute("download", "ventas.csv");
+        archivo.style.display = "none";
+
+        document.body.appendChild(archivo);
+
+        archivo.click();
+
+        document.body.removeChild(archivo);
+
+        //--
+
+        var archivo2 = document.createElement("a");
+
+        var parrafo2 = document.querySelector("p");
+
+        var texto2 = parrafo2.querySelector("#innerVentas2");
+
+        var salida2 = ventas2.replace(/<br>/g, "\n").trim();
+
+        var salida2Plus = salida2.replace(/<br/g, "").trim();
+
+        archivo2.setAttribute(
+          "href",
+          "data:text/plane;charset=UTF-8," + encodeURIComponent(salida2Plus)
+        );
+        archivo2.setAttribute("download", "ventas_detalles.csv");
+        archivo2.style.display = "none";
+
+        document.body.appendChild(archivo2);
+
+        archivo2.click();
+
+        document.body.removeChild(archivo2);
+
+      }
+
+      function JSONgenerator() {
+        var numero = document.getElementById("genNumber").value;
+
+            var data = {
+                ventas: [],
+                ventas_detalle: []
+            };
+
+            for (let i = 1; i <= numero; i++) {
+                data.ventas.push({
+                    id: i,
+                    fecha: ranDate(),
+                    hora: ranTime()
+                });
+
+                var idSells = Math.floor(Math.random() * 10) + 1;
+                for (let j = 0; j < idSells; j++) {
+                    data.ventas_detalle.push({
+                        idSellsnta: i,
+                        IDProducto: (Math.floor(Math.random() * 10) + 1)
+                    });
+                }
+            }
+
+           
+            var jsonOutput = JSON.stringify(data, null, 2); //
+
+            var archivo = document.createElement("a");
+            archivo.href = "data:application/json;charset=utf-8," + encodeURIComponent(jsonOutput);
+            archivo.download = "ventas.json";
+            archivo.style.display = "none";
+
+            document.body.appendChild(archivo);
+
+            archivo.click();
+
+            document.body.removeChild(archivo);
+      }
+    </script>
+  </head>
+
+  <body>
+    <input
+      type="number"
+      id="genNumber"
+      placeholder="Generar X ventas:"
+      value="10"
+      required
+    />
+    <input type="button" value="generar ventas SQL" onclick="generador()" />
+    <br />
+    <input type="button" value="generar ventas CSV" onclick="generadorCsv()" />
+    <br />
+    <input type="button" value="generar ventas JSON" onclick="generadorJSON()" />
+    <br />
+    <input type="button" value="Guardar SQL" onclick=" generarArchivoSQL()" />
+    <br />
+    <input type="button" value="Guardar CSV" onclick=" CSVgenerator()" />
+    <br />
+    <input type="button" value="Guardar JSON" onclick=" generarArchivoJson()" />
+
+    <p id="innerVentas"></p>
+
+    <p id="innerVentas2"></p>
+  </body>
+</html>
